@@ -13,31 +13,38 @@ buildscript {
     }
 
     dependencies {
-        classpath 'com.android.tools.build:gradle:8.1.+'
+        classpath 'com.android.tools.build:gradle:8.1.4'
+        classpath  ('net.java.dev.jna:jna:5.16.0@aar')
     }
 }
 
 plugins {
-    id 'com.android.library' version '8.1.+'
+//     id(libs.plugins.android.application.get().pluginId) apply false
+//     id(libs.plugins.android.library.get().pluginId) apply false
+    id 'com.android.library' apply false
 }
 
 repositories {
     google()
     mavenCentral()
 }
-
+apply plugin: 'com.android.library'
 dependencies {
-    implementation 'net.java.dev.jna:jna:5.13.0@aar'
+    implementation('net.java.dev.jna:jna:5.16.0@aar')
 }
 
 android {
-    compileSdk 33
+    compileSdk 35
     defaultConfig {
-        minSdkVersion 24
+        minSdkVersion 34
         externalNativeBuild.cmake {
-            arguments "-DANDROID_PLATFORM=$minSdk", "-DLSL_SLIMARCHIVE=ON"
+            arguments "-DANDROID_PLATFORM=$minSdk", "-DLSL_SLIMARCHIVE=ON", "-DCMAKE_BUILD_TYPE=Release"
             cppFlags "-fexceptions","-std=c++17"
             targets "lsl"
+        }
+        ndk {
+            abiFilters.clear() // remove any previous filters
+            abiFilters.add("arm64-v8a")
         }
     }
 
@@ -48,10 +55,13 @@ android {
         // If the Android SDK CMake is older than 3.12, you need to install CMake locally and
         // configure the path in your local.properties file, e.g.
         // cmake.dir=C\:\\Program Files\\CMake
-        version '3.18.1+'
+        version '3.31.6+'
         path(properties['liblsl_path'] ?: '../liblsl/CMakeLists.txt')
     }
     compileOptions {
-        sourceCompatibility JavaVersion.VERSION_1_8
+        sourceCompatibility JavaVersion.VERSION_17
+        targetCompatibility JavaVersion.VERSION_17
     }
+    ndkVersion '29.0.13113456'
+    buildToolsVersion '36.0.0-rc5'
 }
